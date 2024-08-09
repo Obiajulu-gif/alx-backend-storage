@@ -3,7 +3,7 @@
 SELECT
     band_name,
     CASE
-        WHEN split = '0' THEN 2022 - formed
+        WHEN split IS NULL THEN 2022 - formed
         ELSE split - formed
     END AS lifespan
 FROM 
