@@ -2,13 +2,10 @@
 
 SELECT 
     band_name,
-    CASE
-        WHEN split = '0' THEN 2022 - formed
-        ELSE split - formed
-    END AS lifespan
+    (IFNULL(split, '2023') - formed) AS lifespan
 FROM 
     metal_bands
 WHERE 
-    style = 'Glam rock'
+    FIND_IN_SET('Glam rock', IFNULL(style, ""))
 ORDER BY 
     lifespan DESC;
