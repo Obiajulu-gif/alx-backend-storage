@@ -12,10 +12,14 @@ from typing import Union, Callable, Optional
 def count_calls(method: Callable) -> Callable:
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
+        # Create a key based on the qualified name of the method
         key = f"count:{method.__qualname__}"
-        self._redis.incr(key)  # Increment the method call count
+        # Increment the count in Redis
+        self._redis.incr(key)
+        # Call the original method and return its result
         return method(self, *args, **kwargs)
     return wrapper
+
 
 class Cache:
     def __init__(self):
