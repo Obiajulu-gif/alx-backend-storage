@@ -5,8 +5,17 @@ Exercise file
 
 import redis
 import uuid
+import functools
 from typing import Union, Callable, Optional
 
+
+def count_calls(method: Callable) -> Callable:
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        key = f"count:{method.__qualname__}"
+        self._redis.incr(key)  # Increment the method call count
+        return method(self, *args, **kwargs)
+    return wrapper
 
 class Cache:
     def __init__(self):
@@ -14,6 +23,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """Store the input data in Redis using a random key"""
         key = str(uuid.uuid4())
