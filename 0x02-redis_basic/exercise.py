@@ -9,6 +9,23 @@ import functools
 from typing import Union, Callable, Optional
 
 
+def call_history(method):
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        inputs_key = f"{method.__qualname__}:inputs"
+        outputs_key = f"{method.__qualname__}:outputs"
+
+        # Store the input arguments
+        self._redis.rpush(inputs_key, str(args))
+
+        # Execute the wrapped function and store its output
+        result = method(self, *args, **kwargs)
+        self._redis.rpush(outputs_key, str(result))
+
+        return result
+    return wrapper
+
+
 def count_calls(method: Callable) -> Callable:
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
@@ -28,6 +45,7 @@ class Cache:
         self._redis.flushdb()
 
     @count_calls
+    @call_history
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """Store the input data in Redis using a random key"""
         key = str(uuid.uuid4())
