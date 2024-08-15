@@ -75,7 +75,7 @@ class Cache:
         value = self.get(key)
         return int(value) if value is not None else None
 
-    def replay(func):
+    def replay(func: Callable) -> None:
         cache_instance = func.__self__  # Get the instance of Cache class
         method_name = func.__qualname__
         inputs_key = "{}:inputs".format(method_name)
