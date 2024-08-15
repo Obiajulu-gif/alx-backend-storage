@@ -10,7 +10,7 @@ r = redis.Redis()
 
 
 def count_calls(method: Callable) -> Callable:
-
+    """Count the number of times a URL is accessed."""
     @wraps(method)
     def wrapper(url: str) -> str:
         count_key = "count:{}".format(url)
