@@ -78,17 +78,17 @@ class Cache:
     def replay(func):
         cache_instance = func.__self__  # Get the instance of Cache class
         method_name = func.__qualname__
-        inputs_key = f"{method_name}:inputs"
-        outputs_key = f"{method_name}:outputs"
+        inputs_key = "{}:inputs".format(method_name)
+        outputs_key = "{}:outputs".format(method_name)
 
         # Retrieve the history of inputs and outputs from Redis
         inputs = cache_instance._redis.lrange(inputs_key, 0, -1)
         outputs = cache_instance._redis.lrange(outputs_key, 0, -1)
 
         # Count how many times the function was called
-        call_count = cache_instance._redis.get(f"count:{method_name}")
-        print(f"{method_name} was called {call_count.decode('utf-8')} times:")
-
+        call_count = cache_instance._redis.get("count:{}".format(method_name))
+        print("{} was called {} times:".format(
+            method_name, call_count.decode('utf-8')))
         # Loop over inputs and outputs and print them
         for input_str, output_str in zip(inputs, outputs):
             print("{}(*{}) -> {}".format(
