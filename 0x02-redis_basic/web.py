@@ -13,8 +13,8 @@ def count_calls(method: Callable) -> Callable:
 
     @wraps(method)
     def wrapper(url: str) -> str:
-        count_key = f"count:{url}"
-        cache_key = f"cache:{url}"
+        count_key = "count:{}".format(url)
+        cache_key = "cache:{}".format(url)
         # Increment the URL access count
         r.incr(count_key)
         # Check if the URL's content is already cached
