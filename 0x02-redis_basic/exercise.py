@@ -9,7 +9,7 @@ import functools
 from typing import Union, Callable, Optional
 
 
-def call_history(method):
+def call_history(method: Callable) -> Callable:
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
         inputs_key = f"{method.__qualname__}:inputs"
