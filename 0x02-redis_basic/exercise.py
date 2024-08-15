@@ -74,3 +74,24 @@ class Cache:
         """Retrieve an integer from Redis"""
         value = self.get(key)
         return int(value) if value is not None else None
+
+    def replay(func):
+        cache_instance = func.__self__  # Get the instance of Cache class
+        method_name = func.__qualname__
+        inputs_key = f"{method_name}:inputs"
+        outputs_key = f"{method_name}:outputs"
+
+        # Retrieve the history of inputs and outputs from Redis
+        inputs = cache_instance._redis.lrange(inputs_key, 0, -1)
+        outputs = cache_instance._redis.lrange(outputs_key, 0, -1)
+
+        # Count how many times the function was called
+        call_count = cache_instance._redis.get(f"count:{method_name}")
+        print(f"{method_name} was called {call_count.decode('utf-8')} times:")
+
+        # Loop over inputs and outputs and print them
+        for input_str, output_str in zip(inputs, outputs):
+            print("{}(*{}) -> {}".format(
+                method_name,
+                input_str.decode('utf-8'),
+                output_str.decode('utf-8')))
